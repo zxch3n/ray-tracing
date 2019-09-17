@@ -2,6 +2,7 @@
 #include "ray.h"
 #include "hittable.h"
 #include "rand.h"
+#include "texture.h"
 
 
 class material {
@@ -13,8 +14,8 @@ public:
 
 class lambertian: public material {
 public: 
-    vec3 a;
-    lambertian (const vec3& a): a(a){}
+    texture* a;
+    lambertian (texture* a): a(a){}
     virtual bool scatter (const ray& r, hit_record& rec, 
         vec3& attenuation, 
         ray& scattered) const;
@@ -25,7 +26,7 @@ bool lambertian::scatter(
     vec3 &attenuation, ray &scattered) const
 {
     const vec3 target = rec.p + rec.normal + random_in_unit_sphere();
-    attenuation = a;
+    attenuation = a->value(0, 0, rec.p);
     scattered = ray(rec.p, target - rec.p);
     return true;
 }

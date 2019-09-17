@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include "material.h"
 #include "hittable.h"
 
@@ -8,9 +9,23 @@ public:
     vec3 center;
     float radius;
     sphere(){};
-    sphere(vec3 center, float radius, material* m) : center(center), radius(radius), m(m){};
+    sphere(vec3 center, float radius, material *m) : center(center), radius(radius), m(m)
+    {
+        bbox = aabb(
+            center - vec3(radius, radius, radius), 
+            center + vec3(radius, radius, radius)
+        );
+    };
+
     virtual bool hit(const ray &r, float t_min, float t_max, hit_record &record) const;
+    virtual bool bounding_box(aabb & box) const
+    {
+        box = bbox;
+        return true;
+    }
+
     material* m;
+    aabb bbox;
 };
 
 bool sphere::hit(const ray &r, float t_min, float t_max, hit_record &rec) const

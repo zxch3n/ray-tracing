@@ -6,7 +6,9 @@
 #include "rand.h"
 #include "camera.h"
 #include "material.h"
+#include "bvh.h"
 #include <float.h>
+#include <vector>
 
 
 bool hit_sphere(const vec3& center, float radius, const ray& r) {
@@ -18,7 +20,7 @@ bool hit_sphere(const vec3& center, float radius, const ray& r) {
     return (discriminant > 0);
 }
 
-vec3 color(const ray& r, const hittable_list* world, int depth) {
+vec3 color(const ray& r, const hittable* world, int depth) {
     if (depth > 50) {
         return vec3(0, 0, 0);
     }
@@ -41,7 +43,8 @@ vec3 color(const ray& r, const hittable_list* world, int depth) {
 
 hittable_list *random_scene() {
     int n = 500;
-    hittable **list = new hittable*[n+1];
+    std::vector<hittable*> *vlist = new std::vector<hittable*>(n);
+    std::vector<hittable*>& list = *vlist;
     list[0] =  new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5, 0.5, 0.5)));
     int i = 1;
     for (int a = -11; a < 11; a++) {
@@ -74,15 +77,18 @@ hittable_list *random_scene() {
     list[i++] = new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5));
     list[i++] = new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1)));
     list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
+    list.resize(i);
 
-    return new hittable_list(list,i);
+    hittable **ans = new hittable*[1];
+    ans[0] = new bvh(list, 0, i);
+    return new hittable_list(ans, 1);
 }
 
 int main()
 {
     int nx = 600;
     int ny = 600;
-    int n_sample = 20;
+    int n_sample = 1;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
     hittable_list *world = random_scene();

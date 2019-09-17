@@ -34,7 +34,7 @@ public:
         }
 
         int axis = int(random_double() * 3);
-        std::sort(hittables.begin(), hittables.end(), [axis](hittable* a, hittable* b) {
+        std::sort(hittables.begin() + l, hittables.begin() + r, [axis](hittable* a, hittable* b) {
             aabb abox, bbox;
             if (!a->bounding_box(abox) || !b->bounding_box(bbox))
             {

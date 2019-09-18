@@ -1,3 +1,4 @@
+#define STB_IMAGE_IMPLEMENTATION
 #include <iostream>
 #include "vec3.h"
 #include "ray.h"
@@ -11,6 +12,7 @@
 #include "perlin.h"
 #include <float.h>
 #include <vector>
+#include "./stb/stb_image.h"
 
 
 bool hit_sphere(const vec3& center, float radius, const ray& r) {
@@ -51,7 +53,7 @@ hittable_list *random_scene() {
         new constant_texture(vec3(0.8, 0.2, 0.2)),
         new constant_texture(vec3(0.7, 0.7, 0.8))
     );
-    list[0] = new sphere(vec3(0, -1000, 0), 1000, new lambertian(new noise_texture(20.0)));
+    list[0] = new sphere(vec3(0, -1000, 0), 1000, new lambertian(new noise_texture(1.0)));
     int i = 1;
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
@@ -81,8 +83,10 @@ hittable_list *random_scene() {
     }
 
     list[i++] = new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5));
-    // list[i++] = new sphere(vec3(-4, 1, 0), 1.0, new lambertian(new constant_texture(vec3(0.4, 0.2, 0.1))));
-    list[i++] = new sphere(vec3(-4, 1, 0), 1.0, new lambertian(new noise_texture(10.0)));
+    int nx, ny, nn;
+    unsigned char *tex_data = stbi_load("earthmap.jpg", &nx, &ny, &nn, 0);
+    material *mat = new lambertian(new image_texture(tex_data, nx, ny));
+    list[i++] = new sphere(vec3(-4, 1, 0), 1.0, mat);
     list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
     list.resize(i);
 
@@ -99,7 +103,7 @@ int main()
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
     hittable_list *world = random_scene();
-    camera c(vec3(-10, 1.5, 4), vec3(0, 1, 0), vec3(0, 1, 0), 0.02, 45, float(nx) / float(ny));
+    camera c(vec3(10, 1.5, 4), vec3(0, 1, 0), vec3(0, 1, 0), 0.02, 45, float(nx) / float(ny));
     for (int j = ny - 1; j >= 0; j--)
     {
         for (int i = 0; i < nx; i++)

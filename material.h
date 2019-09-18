@@ -26,7 +26,7 @@ bool lambertian::scatter(
     vec3 &attenuation, ray &scattered) const
 {
     const vec3 target = rec.p + rec.normal + random_in_unit_sphere();
-    attenuation = a->value(0, 0, rec.p);
+    attenuation = a->value(rec.u, rec.v, rec.p);
     scattered = ray(rec.p, target - rec.p);
     return true;
 }

@@ -40,6 +40,20 @@ public:
         return trilinear_interp(c, u, v, w);
     }
 
+    float turb(const vec3 &p, int depth = 7) const
+    {
+        float accum = 0;
+        vec3 temp_p = p;
+        float weight = 1.0;
+        for (int i = 0; i < depth; i++)
+        {
+            accum += weight * noise(temp_p);
+            weight *= 0.5;
+            temp_p *= 2;
+        }
+        return fabs(accum);
+    }
+
     static vec3 *ranfloat;
     static int *perm_x;
     static int *perm_y;
@@ -95,7 +109,6 @@ public:
     noise_texture(float scale): scale(scale) {}
     virtual vec3 value(float u, float v, const vec3 &p)
     {
-        float noise = _noise.noise(p * scale);
-        return vec3(1, 1, 1) * (0.5 + noise);
+        return vec3(1, 1, 1) * 0.5 * (1 + sin(scale * p.z() + 10 * _noise.turb(p)));
     }
 };

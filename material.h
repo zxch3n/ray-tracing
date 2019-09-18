@@ -9,6 +9,24 @@ class material {
 public:
     virtual bool scatter (const ray& r, hit_record& rec, vec3& attenuation, 
         ray& scattered) const = 0;
+    virtual vec3 emit (float u, float v, const vec3& p) const {
+        return vec3(0, 0, 0);
+    }
+};
+
+
+class diffuse_light: public material {
+public:
+    texture *_texture;
+    diffuse_light(texture* _t): _texture(_t){}
+    virtual bool scatter (const ray& r, hit_record& rec, 
+        vec3& attenuation, ray&scattered) const {
+        return false;
+    }
+
+    virtual vec3 emit (float u, float v, const vec3& p) const {
+        return _texture->value(u, v, p);
+    }
 };
 
 

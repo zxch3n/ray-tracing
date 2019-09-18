@@ -33,16 +33,20 @@ vec3 color(const ray& r, const hittable* world, int depth) {
     if (world->hit(r, 0.001, FLT_MAX, rec)) {
         ray scattered;
         vec3 attenuate;
+        const vec3 emitted = rec.m->emit(rec.u, rec.v, rec.p);
         if (rec.m->scatter(r, rec, attenuate, scattered)) {
-            return attenuate * color(scattered, world, depth + 1);
+            return emitted + attenuate * color(scattered, world, depth + 1);
         } else {
-            return vec3(0, 0, 0);
+            return emitted;
         }
     }
 
-    vec3 unit_direction = unit_vector(r.direction());
-    float t = 0.5*(unit_direction.y() + 1.0);
-    return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+    return vec3(0, 0, 0);
+
+    // vec3 unit_direction = unit_vector(r.direction());
+    // float t = 0.5*(unit_direction.y() + 1.0);
+    // return (1.0-t)*vec3(0.2, 0.2, 0.2) + t*vec3(0.0, 0.1, 0.0);
+    // return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
 }
 
 hittable_list *random_scene() {
@@ -88,6 +92,7 @@ hittable_list *random_scene() {
     material *mat = new lambertian(new image_texture(tex_data, nx, ny));
     list[i++] = new sphere(vec3(-4, 1, 0), 1.0, mat);
     list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
+    list[i++] = new sphere(vec3(0, 6, 0), 4.0, new diffuse_light(new constant_texture(vec3(0.5, 0.7, 1.0))));
     list.resize(i);
 
     hittable **ans = new hittable*[1];
@@ -99,7 +104,7 @@ int main()
 {
     int nx = 600;
     int ny = 600;
-    int n_sample = 2;
+    int n_sample = 20;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
     hittable_list *world = random_scene();

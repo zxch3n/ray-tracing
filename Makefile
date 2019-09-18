@@ -3,3 +3,7 @@ build:
 
 run:
 	./main.exe > output.ppm
+
+start:
+	make build
+	make run

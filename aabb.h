@@ -1,14 +1,6 @@
 #pragma once
 #include "vec3.h"
-
-inline float min(float a, float b) {
-    return a > b? b : a;
-}
-
-inline float max(float a, float b) {
-    return a < b? b : a;
-}
-
+#include "constant.h"
 
 class aabb {
 public:
@@ -20,6 +12,15 @@ public:
             vec3(min(a.x(), b.x()), min(a.y(), b.y()), min(a.z(), b.z())),
             vec3(max(a.x(), b.x()), max(a.y(), b.y()), max(a.z(), b.z()))
         );
+    }
+
+    bool contains(const vec3& v) const {
+        for (int i = 0; i < 3; i++){
+            if (v[i] > b[0] || v[i] < a[0])
+                return false;
+        }
+
+        return true;
     }
 };
 

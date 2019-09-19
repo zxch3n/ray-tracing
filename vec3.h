@@ -1,8 +1,8 @@
 #pragma once
-
 #include <math.h>
 #include <stdlib.h>
 #include <iostream>
+#include "constant.h"
 
 
 class vec3 {
@@ -15,6 +15,11 @@ public:
     inline float r() const { return e[0]; }
     inline float g() const { return e[1]; }
     inline float b() const { return e[2]; }
+    void clamp_(float min_, float max_) { 
+        e[0] = max(min_, min(max_, e[0]));
+        e[1] = max(min_, min(max_, e[1]));
+        e[2] = max(min_, min(max_, e[2]));
+     }
 
     inline const vec3& operator+() const { return *this; }
     inline vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }

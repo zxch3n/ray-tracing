@@ -1,8 +1,8 @@
 #pragma once
-#include "ray.h"
 #include "aabb.h"
 
 
+class ray;
 class material;
 struct hit_record {
     float t;

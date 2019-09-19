@@ -2,6 +2,7 @@
     "files.associations": {
         "cmath": "cpp",
         "algorithm": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "cstdlib": "cpp"
     }
 }

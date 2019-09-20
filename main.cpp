@@ -1,6 +1,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <iostream>
 #include "vec3.h"
+#include "math.h"
 #include "ray.h"
 #include "hittable_list.h"
 #include "sphere.h"
@@ -47,7 +48,6 @@ vec3 color(const ray &r, const hittable *world, int depth,
             return color(scattered, world, depth + 1, (emitted + acc_emitted), attenuate * acc_attenuate);
         } else {
             vec3 ans = (emitted + acc_emitted) * acc_attenuate;
-            ans.clamp_(0, 1);
             return ans;
         }
     }
@@ -63,7 +63,7 @@ hittable_list *random_scene() {
         new constant_texture(vec3(0.8, 0.2, 0.2)),
         new constant_texture(vec3(0.7, 0.7, 0.8))
     );
-    list[0] = new sphere(vec3(0, -1000, 0), 1000, new lambertian(new constant_texture(vec3(0.8, 0.4, 1.0))));
+    list[0] = new sphere(vec3(0, -1000, 0), 1000, new lambertian(new constant_texture(vec3(0.95, 0.95, 0.95))));
     int i = 1;
     for (int a = -2; a < 2; a++) {
         for (int b = -2; b < 2; b++) {
@@ -95,21 +95,20 @@ hittable_list *random_scene() {
         }
     }
 
-    list[i++] = new sphere(vec3(1.2, 1.0, 1.6), 0.2, new dielectric(1.5));
     int nx, ny, nn;
     unsigned char *tex_data = stbi_load("earthmap.jpg", &nx, &ny, &nn, 0);
     material *mat = new lambertian(new image_texture(tex_data, nx, ny));
     list[i++] = new sphere(vec3(-1, 1.5, 0.3), 0.3, mat);
     list[i++] = new sphere(vec3(0.6, 1, 0), 0.2, new metal(vec3(1.0, 1.0, 1.0), 0.0));
 
-    list[i++] = new cuboid(vec3(0, 3, 0), vec3(2, 1e-6, 2), new diffuse_light(new constant_texture(vec3(20, 20, 26))));
+    list[i++] = new cuboid(vec3(0, 3, 0), vec3(2, 1e-6, 2), new diffuse_light(new constant_texture(vec3(10, 10, 10))));
     list[i++] = new cuboid(vec3(0, 3.00001, 0), vec3(4, 1e-6, 4), new metal(vec3(1.0, 1.0, 1.0), 0));
     list[i++] = new cuboid(vec3(0, 1.5, -2), vec3(4, 3, 1e-6), new metal(vec3(1.0, 1.0, 1.0), 0));
     list[i++] = new cuboid(vec3(0, 1.5, 4), vec3(4, 3, 1e-6), new metal(vec3(1.0, 1.0, 1.0), 0));
     list[i++] = new cuboid(vec3(2, 1.5, 0), vec3(1e-6, 3, 4), new luminating_mirror(new constant_texture(vec3(0, 0, 0))));
-    list[i++] = new cuboid(vec3(2.0001, 1.5, 0), vec3(1e-6, 1, 1), new diffuse_light(new constant_texture(vec3(10.0, 10.0, 18.0))));
+    list[i++] = new cuboid(vec3(2.0001, 1.5, 0), vec3(1e-6, 1, 1), new diffuse_light(new constant_texture(vec3(10.0, 10.0, 10.0))));
     list[i++] = new cuboid(vec3(-2, 1.5, 0), vec3(1e-6, 3, 4), new luminating_mirror(new constant_texture(vec3(0.0, 0.0, 0))));
-    list[i++] = new cuboid(vec3(-1.9999, 1.5, 0), vec3(1e-6, 1, 1), new diffuse_light(new constant_texture(vec3(10.0, 10.0, 18.0))));
+    list[i++] = new cuboid(vec3(-1.9999, 1.5, 0), vec3(1e-6, 1, 1), new diffuse_light(new constant_texture(vec3(10.0, 10.0, 10.0))));
     list.resize(i);
 
     hittable **ans = new hittable*[1];
@@ -119,9 +118,9 @@ hittable_list *random_scene() {
 
 int main()
 {
-    int nx = 600;
-    int ny = 600;
-    int n_sample = 100;
+    int nx = 1200;
+    int ny = 1200;
+    int n_sample = 2000;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
     hittable_list *world = random_scene();
@@ -138,6 +137,7 @@ int main()
             }
 
             vec3 col = color_sum / n_sample;
+            col.clamp_(0, 1);
             col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
             int ir = int(255.99 * col[0]);
             int ig = int(255.99 * col[1]);
